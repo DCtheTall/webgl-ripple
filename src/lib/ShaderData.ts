@@ -7,7 +7,7 @@ export default class ShaderData {
 
   constructor(
     public readonly locationName: string,
-    { data }: ShaderDataOptions = {},
+    {data}: ShaderDataOptions = {},
   ) {
     this.data = data;
   }

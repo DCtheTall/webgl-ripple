@@ -80,9 +80,6 @@ export class Vector2Attribute extends VectorAttribute {
     opts: VectorShaderAttributeOptions = {},
   ) {
     super(locationName, opts);
-    if (opts.data && opts.data.length !== 2) {
-      throw new Error('Mismatched dimension for Vector2Attribute');
-    }
   }
 }
 
@@ -92,9 +89,6 @@ export class Vector3Attribute extends VectorAttribute {
     opts: VectorShaderAttributeOptions = {},
   ) {
     super(locationName, opts);
-    if (opts.data && opts.data.length !== 3) {
-      throw new Error('Mismatched dimension for Vector3Attribute');
-    }
   }
 }
 
@@ -104,8 +98,5 @@ export class Vector4Attribute extends VectorAttribute {
     opts: VectorShaderAttributeOptions = {},
   ) {
     super(locationName, opts);
-    if (opts.data && opts.data.length !== 4) {
-      throw new Error('Mismatched dimension for Vector4Attribute');
-    }
   }
 }

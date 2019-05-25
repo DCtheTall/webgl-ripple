@@ -33,7 +33,6 @@ export default class Shader {
   constructor(
     vertexShader: string,
     fragmentShader: string,
-    public readonly nVertices: number,
     private readonly attributes: ShaderAttributes = {},
     private readonly uniforms: ShaderUniforms = {},
   ) {

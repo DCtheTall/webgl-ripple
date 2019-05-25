@@ -19,8 +19,8 @@ export default class Frame {
   constructor(
     public readonly width: number,
     public readonly height: number,
-    public readonly shader: Shader,
     public readonly nVertices: number,
+    public readonly shader: Shader,
     options: FrameOptions = {},
   ) {
     this.mode = options.mode || WebGLRenderingContext.TRIANGLE_STRIP;
