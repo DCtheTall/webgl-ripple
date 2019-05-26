@@ -2,7 +2,7 @@ import Scene from './lib/Scene';
 import Frame from './lib/Frame';
 import Shader from './lib/Shader';
 import { Vector2Attribute } from './lib/ShaderAttribute';
-import { IntegerUniform, ShaderUniform } from './lib/ShaderUniform';
+import { IntegerUniform, ShaderUniform, Vector2Uniform } from './lib/ShaderUniform';
 
 const VERTEX_SHADER = require('./shaders/vertex.glsl') as string;
 const RIPPLE_FRAGMENT_SHADER =
@@ -28,6 +28,7 @@ function initCanvasWithNormalDistribution() {
     u /= (sigma ** 2);
     u = Math.exp(-u);
     if (u < 1e-4) u = 0;
+    u = (0.5 * u) + 0.5;
     u *= 255;
     ctx.fillStyle = `rgba(${u},${u},${u},1)`;
     ctx.fillRect(x, y, 1, 1);
@@ -51,6 +52,7 @@ document.body.onload = function main() {
   }, {
     uPreviousFrame0: new IntegerUniform('u_PreviousFrame0', {data: 0}),
     uPreviousFrame1: new IntegerUniform('u_PreviousFrame1', {data: 1}),
+    uResolution: new Vector2Uniform('u_Resolution', {data: [w, h]}),
   });
   for (let i = 0; i < 3; i++) {
     scene.addRenderFrame(`ripple${i}`, new Frame(w, h, 4, rippleShader));
@@ -67,8 +69,29 @@ document.body.onload = function main() {
   scene.addRenderFrame('window', new Frame(w, h, 4, windowShader));
 
   scene.addTexture('normal_dist', initCanvasWithNormalDistribution());
-  scene.render(false, () => {
-    scene.bindTexture('normal_dist', WebGLRenderingContext.TEXTURE0);
+
+  let epoch = 0;
+  scene.render(true, () => {
+    switch (epoch++) {
+      case 0:
+        scene.bindTexture('normal_dist', WebGLRenderingContext.TEXTURE0);
+        scene.bindTexture('normal_dist', WebGLRenderingContext.TEXTURE1);
+        scene.renderFrameAsTexture('ripple0', WebGLRenderingContext.TEXTURE0);
+      case 1:
+        scene.bindTexture('normal_dist', WebGLRenderingContext.TEXTURE0);
+        scene.bindFrameToTexture('ripple0', WebGLRenderingContext.TEXTURE1);
+        scene.renderFrameAsTexture('ripple1', WebGLRenderingContext.TEXTURE0);
+      default:
+        scene.bindFrameToTexture('ripple0', WebGLRenderingContext.TEXTURE0);
+        scene.bindFrameToTexture('ripple1', WebGLRenderingContext.TEXTURE1);
+        scene.renderFrameAsTexture('ripple2', WebGLRenderingContext.TEXTURE0);
+
+        const tmp = scene.getRenderFrame('ripple0');
+        scene.setRenderFrame('ripple0', scene.getRenderFrame('ripple1'));
+        scene.setRenderFrame('ripple1', scene.getRenderFrame('ripple2'));
+        scene.setRenderFrame('ripple2', tmp);
+        break;
+    }
     scene.renderFrameToCanvas('window');
   });
 }

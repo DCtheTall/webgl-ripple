@@ -58,9 +58,6 @@ export default class Scene {
   }
 
   public getRenderFrame(key: string): Frame {
-    if (!this.frames.has('key')) {
-      throw new Error(`Scene has not frame labeled: ${key}`);
-    }
     return this.frames.get(key);
   }
 
