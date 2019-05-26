@@ -166,18 +166,18 @@ eval("\nObject.defineProperty(exports, \"__esModule\", { value: true });\nconst 
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-eval("\nObject.defineProperty(exports, \"__esModule\", { value: true });\nconst Scene_1 = __webpack_require__(/*! ./lib/Scene */ \"./src/lib/Scene.ts\");\nconst Frame_1 = __webpack_require__(/*! ./lib/Frame */ \"./src/lib/Frame.ts\");\nconst Shader_1 = __webpack_require__(/*! ./lib/Shader */ \"./src/lib/Shader.ts\");\nconst ShaderAttribute_1 = __webpack_require__(/*! ./lib/ShaderAttribute */ \"./src/lib/ShaderAttribute.ts\");\nconst VERTEX_SHADER = __webpack_require__(/*! ./shaders/vertex.glsl */ \"./src/shaders/vertex.glsl\");\nconst FRAGMENT_SHADER = __webpack_require__(/*! ./shaders/fragment.glsl */ \"./src/shaders/fragment.glsl\");\nconst FULL_VIEW_PLANE_VERTICES = [-1, 1, -1, -1, 1, 1, 1, -1];\nconst FULL_PLANE_VIEW_TEX_COORDS = [0, 1, 0, 0, 1, 1, 1, 0];\ndocument.body.onload = function main() {\n    const canvas = document.getElementById('canvas');\n    const w = canvas.width = window.innerWidth;\n    const h = canvas.height = window.innerHeight;\n    const scene = new Scene_1.default(canvas);\n    const tmpShader = new Shader_1.default(VERTEX_SHADER, FRAGMENT_SHADER, {\n        aVertices: new ShaderAttribute_1.Vector2Attribute('a_Position', { data: FULL_VIEW_PLANE_VERTICES }),\n    });\n    const tmpFrame = new Frame_1.default(w, h, 4, tmpShader);\n    scene.addRenderFrame('tmp', tmpFrame);\n    scene.render(false, () => {\n        scene.renderFrameToCanvas('tmp');\n    });\n};\n\n\n//# sourceURL=webpack:///./src/main.ts?");
+eval("\nObject.defineProperty(exports, \"__esModule\", { value: true });\nconst Scene_1 = __webpack_require__(/*! ./lib/Scene */ \"./src/lib/Scene.ts\");\nconst Frame_1 = __webpack_require__(/*! ./lib/Frame */ \"./src/lib/Frame.ts\");\nconst Shader_1 = __webpack_require__(/*! ./lib/Shader */ \"./src/lib/Shader.ts\");\nconst ShaderAttribute_1 = __webpack_require__(/*! ./lib/ShaderAttribute */ \"./src/lib/ShaderAttribute.ts\");\nconst ShaderUniform_1 = __webpack_require__(/*! ./lib/ShaderUniform */ \"./src/lib/ShaderUniform.ts\");\nconst VERTEX_SHADER = __webpack_require__(/*! ./shaders/vertex.glsl */ \"./src/shaders/vertex.glsl\");\nconst RIPPLE_FRAGMENT_SHADER = __webpack_require__(/*! ./shaders/ripple.fragment.glsl */ \"./src/shaders/ripple.fragment.glsl\");\nconst WINDOW_FRAGMENT_SHADER = __webpack_require__(/*! ./shaders/window.fragment.glsl */ \"./src/shaders/window.fragment.glsl\");\nconst FULL_VIEW_PLANE_VERTICES = [-1, 1, -1, -1, 1, 1, 1, -1];\nconst FULL_PLANE_VIEW_TEX_COORDS = [0, 1, 0, 0, 1, 1, 1, 0];\ndocument.body.onload = function main() {\n    const canvas = document.getElementById('canvas');\n    const w = canvas.width = window.innerWidth;\n    const h = canvas.height = window.innerHeight;\n    const scene = new Scene_1.default(canvas);\n    const rippleShader = new Shader_1.default(VERTEX_SHADER, RIPPLE_FRAGMENT_SHADER, {\n        aVertices: new ShaderAttribute_1.Vector2Attribute('a_Position', { data: FULL_VIEW_PLANE_VERTICES }),\n        aTextureCoord: new ShaderAttribute_1.Vector2Attribute('a_TextureCoord', { data: FULL_PLANE_VIEW_TEX_COORDS }),\n    }, {\n        uPreviousFrame0: new ShaderUniform_1.IntegerUniform('u_PreviousFrame0', { data: 0 }),\n        uPreviousFrame1: new ShaderUniform_1.IntegerUniform('u_PreviousFrame1', { data: 1 }),\n    });\n    for (let i = 0; i < 3; i++) {\n        scene.addRenderFrame(`ripple${i}`, new Frame_1.default(w, h, 4, rippleShader));\n    }\n    const windowShader = new Shader_1.default(VERTEX_SHADER, WINDOW_FRAGMENT_SHADER, {\n        aVertices: new ShaderAttribute_1.Vector2Attribute('a_Position', { data: FULL_VIEW_PLANE_VERTICES }),\n        aTextureCoord: new ShaderAttribute_1.Vector2Attribute('a_TextureCoord', { data: FULL_PLANE_VIEW_TEX_COORDS }),\n    }, {\n        uCurrentFrame: new ShaderUniform_1.IntegerUniform('u_CurrentFrame', { data: 0 }),\n    });\n    scene.addRenderFrame('window', new Frame_1.default(w, h, 4, windowShader));\n    scene.render(false, () => {\n        scene.renderFrameAsTexture('ripple0', WebGLRenderingContext.TEXTURE0);\n        scene.renderFrameToCanvas('window');\n    });\n};\n\n\n//# sourceURL=webpack:///./src/main.ts?");
 
 /***/ }),
 
-/***/ "./src/shaders/fragment.glsl":
-/*!***********************************!*\
-  !*** ./src/shaders/fragment.glsl ***!
-  \***********************************/
+/***/ "./src/shaders/ripple.fragment.glsl":
+/*!******************************************!*\
+  !*** ./src/shaders/ripple.fragment.glsl ***!
+  \******************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-eval("module.exports = \"precision highp float;\\n#define GLSLIFY 1\\n\\nvoid main() {\\n  gl_FragColor = vec4(1., 0., 0., 1.);\\n}\\n\"\n\n//# sourceURL=webpack:///./src/shaders/fragment.glsl?");
+eval("module.exports = \"precision highp float;\\n\\nprecision mediump float;\\n#define GLSLIFY 1\\n\\nvarying vec2 v_TextureCoord;\\n\\nuniform sampler2D u_PreviousFrame0;\\nuniform sampler2D u_PreviousFrame1;\\n\\nvoid main() {\\n  gl_FragColor = vec4(1., 0., 0., 1.);\\n}\\n\"\n\n//# sourceURL=webpack:///./src/shaders/ripple.fragment.glsl?");
 
 /***/ }),
 
@@ -188,7 +188,18 @@ eval("module.exports = \"precision highp float;\\n#define GLSLIFY 1\\n\\nvoid ma
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-eval("module.exports = \"precision mediump float;\\n#define GLSLIFY 1\\n\\nattribute vec2 a_Position;\\n\\nvoid main() {\\n  gl_Position = vec4(a_Position, 0., 1.);\\n}\\n\"\n\n//# sourceURL=webpack:///./src/shaders/vertex.glsl?");
+eval("module.exports = \"precision mediump float;\\n#define GLSLIFY 1\\n\\nattribute vec2 a_Position;\\nattribute vec2 a_TextureCoord;\\n\\nvarying vec2 v_TextureCoord;\\n\\nvoid main() {\\n  gl_Position = vec4(a_Position, 0., 1.);\\n  v_TextureCoord = a_TextureCoord;\\n}\\n\"\n\n//# sourceURL=webpack:///./src/shaders/vertex.glsl?");
+
+/***/ }),
+
+/***/ "./src/shaders/window.fragment.glsl":
+/*!******************************************!*\
+  !*** ./src/shaders/window.fragment.glsl ***!
+  \******************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+eval("module.exports = \"precision highp float;\\n\\nprecision mediump float;\\n#define GLSLIFY 1\\n\\nvarying vec2 v_TextureCoord;\\n\\nuniform sampler2D u_CurrentFrame;\\n\\nvoid main() {\\n  gl_FragColor = texture2D(u_CurrentFrame, v_TextureCoord);\\n}\\n\\n\"\n\n//# sourceURL=webpack:///./src/shaders/window.fragment.glsl?");
 
 /***/ })
 
