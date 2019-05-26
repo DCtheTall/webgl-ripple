@@ -8,14 +8,14 @@ function isPowerOfTwo(n: number): boolean {
 }
 
 export default class Scene {
+  private readonly frames: Map<string, Frame> = new Map();
   private gl: WebGLRenderingContext;
   private isAnimating: boolean = false;
   private lastRender: number;
   private rendering: boolean = false;
   private renderFn: () => void;
   private requestAnimFrame: number;
-
-  private readonly frames: Map<string, Frame>;
+  private readonly textures: Map<string, WebGLTexture> = new Map();
 
   constructor(canvas: HTMLCanvasElement) {
     this.gl =
@@ -23,7 +23,6 @@ export default class Scene {
         canvas.getContext('experimental-webgl', {preserveDrawingBuffer: true});
     this.gl.enable(this.gl.DEPTH_TEST);
     this.gl.depthFunc(this.gl.LEQUAL);
-    this.frames = new Map();
   }
 
   public addRenderFrame(key: string, frame: Frame) {
@@ -31,15 +30,38 @@ export default class Scene {
     this.frames.set(key, frame);
   }
 
+  public addTexture(key: string, src: HTMLImageElement | HTMLCanvasElement) {
+    const texture = this.gl.createTexture();
+    this.gl.bindTexture(this.gl.TEXTURE_2D, texture);
+    this.gl.texImage2D(
+      this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.RGBA, this.gl.UNSIGNED_BYTE, src);
+    if (isPowerOfTwo(src.width) && isPowerOfTwo(src.height)) {
+      this.gl.generateMipmap(this.gl.TEXTURE_2D);
+    } else {
+      this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE);
+      this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE);
+      this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
+    }
+    this.textures.set(key, texture);
+    this.gl.bindTexture(this.gl.TEXTURE_2D, null);
+  }
+
+  public bindFrameToTexture(key: string, activeTextureNumber: number) {
+    const frame = this.frames.get(key);
+    this.gl.activeTexture(activeTextureNumber);
+    this.gl.bindTexture(this.gl.TEXTURE_2D, frame.getTexture());
+  }
+
+  public bindTexture(key: string, activeTextureNumber: number) {
+    this.gl.activeTexture(activeTextureNumber);
+    this.gl.bindTexture(this.gl.TEXTURE_2D, this.textures.get(key));
+  }
+
   public getRenderFrame(key: string): Frame {
     if (!this.frames.has('key')) {
       throw new Error(`Scene has not frame labeled: ${key}`);
     }
     return this.frames.get(key);
-  }
-
-  public setRenderFrame(key: string, frame: Frame) {
-    this.frames.set(key, frame);
   }
 
   private renderFrame(
@@ -108,6 +130,10 @@ export default class Scene {
     } else {
       this.renderFn();
     }
+  }
+
+  public setRenderFrame(key: string, frame: Frame) {
+    this.frames.set(key, frame);
   }
 
   public toggleAnimation() {

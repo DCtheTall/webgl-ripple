@@ -5,12 +5,36 @@ import { Vector2Attribute } from './lib/ShaderAttribute';
 import { IntegerUniform, ShaderUniform } from './lib/ShaderUniform';
 
 const VERTEX_SHADER = require('./shaders/vertex.glsl') as string;
-const RIPPLE_FRAGMENT_SHADER = require('./shaders/ripple.fragment.glsl')
+const RIPPLE_FRAGMENT_SHADER =
+    require('./shaders/ripple.fragment.glsl') as string;
 const WINDOW_FRAGMENT_SHADER =
     require('./shaders/window.fragment.glsl') as string;
 
 const FULL_VIEW_PLANE_VERTICES = [-1, 1, -1, -1, 1, 1, 1, -1];
 const FULL_PLANE_VIEW_TEX_COORDS = [0, 1, 0, 0, 1, 1, 1, 0];
+
+function initCanvasWithNormalDistribution() {
+  const canvas = document.createElement('canvas') as HTMLCanvasElement;
+  const w = canvas.width = window.innerWidth;
+  const h = canvas.height = window.innerHeight;
+  const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+
+  const mu = [w, h].map((x) => Math.round(x / 2));
+  const sigma = 5;
+
+  for (let x = 0; x < w; x++)
+  for (let y = 0; y < h; y++) {
+    let u = ((x - mu[0]) ** 2) + ((y - mu[1]) ** 2);
+    u /= (sigma ** 2);
+    u = Math.exp(-u);
+    if (u < 1e-4) u = 0;
+    u *= 255;
+    ctx.fillStyle = `rgba(${u},${u},${u},1)`;
+    ctx.fillRect(x, y, 1, 1);
+  }
+
+  return canvas;
+}
 
 document.body.onload = function main() {
   const canvas = document.getElementById('canvas') as HTMLCanvasElement;
@@ -42,8 +66,9 @@ document.body.onload = function main() {
   });
   scene.addRenderFrame('window', new Frame(w, h, 4, windowShader));
 
+  scene.addTexture('normal_dist', initCanvasWithNormalDistribution());
   scene.render(false, () => {
-    scene.renderFrameAsTexture('ripple0', WebGLRenderingContext.TEXTURE0);
+    scene.bindTexture('normal_dist', WebGLRenderingContext.TEXTURE0);
     scene.renderFrameToCanvas('window');
   });
 }
