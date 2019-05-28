@@ -20,7 +20,7 @@ function initCanvasWithNormalDistribution() {
   const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
 
   const mu = [w, h].map((x) => Math.round(x / 2));
-  const sigma = 5;
+  const sigma = 1;
 
   for (let x = 0; x < w; x++)
   for (let y = 0; y < h; y++) {
