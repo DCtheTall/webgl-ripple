@@ -47,7 +47,11 @@ void main() {
   float lambertian = dot(normal, LIGHT_POSITION);
   float lighting = AMBIENT;
   lighting +=  dot(normal, LIGHT_POSITION) * LAMBERTIAN;
-  float specular = pow(dot(normal, LIGHT_POSITION), 200.0);
+  float specular = pow(dot(normal, LIGHT_POSITION), 50.0);
 
-  gl_FragColor = texture2D(u_Texture, transformedTexCoord) * lighting + specular;
+  vec3 color = texture2D(u_Texture, transformedTexCoord).xyz;
+  color *= lighting;
+  color += vec3(specular);
+
+  gl_FragColor = vec4(clamp(color, vec3(0.0), vec3(1.0)), 1.0);
 }
