@@ -22,9 +22,11 @@ a method for discretizing PDEs given by
 
 <a href="https://www.codecogs.com/eqnedit.php?latex=\ddot{\mathbf{x}}(t)&space;=&space;F(\mathbf{x}(t))" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\ddot{\mathbf{x}}(t)&space;=&space;F(\mathbf{x}(t))" title="\ddot{\mathbf{x}}(t) = F(\mathbf{x}(t))" /></a>
 
-In this case <a href="https://www.codecogs.com/eqnedit.php?latex=F(\mathbf{x}(t))" target="_blank"><img src="https://latex.codecogs.com/gif.latex?F(\mathbf{x}(t))" title="F(\mathbf{x}(t))" /></a> is the [discrete Laplace operator](https://en.wikipedia.org/wiki/Discrete_Laplace_operator),
-which for this program is [convolution](https://en.wikipedia.org/wiki/Convolution#Discrete_convolution)
-with the matrix:
+In this case <a href="https://www.codecogs.com/eqnedit.php?latex=F(\mathbf{x}(t))" target="_blank"><img src="https://latex.codecogs.com/gif.latex?F(\mathbf{x}(t))" title="F(\mathbf{x}(t))" /></a>
+is a [convolution](https://en.wikipedia.org/wiki/Convolution#Discrete_convolution)
+with the
+[discrete Laplace operator](https://en.wikipedia.org/wiki/Discrete_Laplace_operator),
+given by the kernel:
 
 <a href="https://www.codecogs.com/eqnedit.php?latex=\left[&space;\begin{matrix}&space;0.25&space;&&&space;0.5&space;&&&space;0.25&space;\\&space;0.5&space;&&&space;-3.0&space;&&&space;0.5&space;\\&space;0.25&space;&&&space;0.5&space;&&&space;0.25&space;\end{matrix}&space;\right]" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\left[&space;\begin{matrix}&space;0.25&space;&&&space;0.5&space;&&&space;0.25&space;\\&space;0.5&space;&&&space;-3.0&space;&&&space;0.5&space;\\&space;0.25&space;&&&space;0.5&space;&&&space;0.25&space;\end{matrix}&space;\right]" title="\left[ \begin{matrix} 0.25 && 0.5 && 0.25 \\ 0.5 && -3.0 && 0.5 \\ 0.25 && 0.5 && 0.25 \end{matrix} \right]" /></a>
 

@@ -13,7 +13,7 @@ const mat3 LAPLACIAN_KERNEL = mat3(
     0.50, -3.00, 0.50,
     0.25,  0.50, 0.25);
 const float DAMPING = 0.02;
-const float DISPLACEMENT_RADIUS = 0.005;
+const float DISPLACEMENT_RADIUS = 0.01;
 
 #pragma glslify: applyKernel = require(./lib/kernel.glsl);
 
@@ -26,7 +26,7 @@ void main() {
   float damping = 0.0;
 
   // Verlet integration step.
-  float uf = 2.0 * u1 - u0 + 0.5 * L;
+  float uf = 2.0 * u1 - u0 + L;
 
   // Linear damping.
   uf = DAMPING * 0.5 + (1.0 - DAMPING) * uf;
