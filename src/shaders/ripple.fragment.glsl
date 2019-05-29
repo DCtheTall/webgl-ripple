@@ -5,11 +5,15 @@ varying vec2 v_TextureCoord;
 uniform sampler2D u_PreviousFrame0;
 uniform sampler2D u_PreviousFrame1;
 uniform vec2 u_Resolution;
+uniform int u_Input;
+uniform vec2 u_MousePosition;
 
 const mat3 LAPLACIAN_KERNEL = mat3(
     0.25,  0.5, 0.25,
     0.50, -3.0, 0.50,
     0.25,  0.5, 0.25);
+const float DAMPING = 0.001;
+const float DISPLACEMENT_RADIUS = 0.001;
 
 #pragma glslify: applyKernel = require(./lib/kernel.glsl);
 
@@ -21,8 +25,15 @@ void main() {
       u_PreviousFrame1, v_TextureCoord, u_Resolution, LAPLACIAN_KERNEL);
   float damping = 0.0;
 
+  // Verlet integration step.
   float uf = 2.0 * u1 - u0 + 0.5 * L;
-  uf = 0.05 + 0.9 * uf;
-  uf = clamp(uf, 0.0, 1.0);
-  gl_FragColor = vec4(vec3(uf), 1.);
+  uf = DAMPING * 0.5 + (1.0 - DAMPING) * uf;
+
+  float displacement = 0.0;
+  if (u_Input != 0 &&
+      length(v_TextureCoord - u_MousePosition) <= DISPLACEMENT_RADIUS) {
+    displacement -= 1.0;
+  }
+
+  gl_FragColor = vec4(vec3(clamp(uf + displacement, 0.0, 1.0)), 1.0);
 }

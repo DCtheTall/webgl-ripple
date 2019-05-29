@@ -1,7 +1,7 @@
 import Frame from './Frame';
 
 const CLEAR_COLOR = [0, 0, 0, 1];
-const FRAME_RATE = 60;
+const FRAME_RATE = 120;
 
 function isPowerOfTwo(n: number): boolean {
   return (n & (n - 1)) === 0;
@@ -25,7 +25,7 @@ export default class Scene {
     this.gl.depthFunc(this.gl.LEQUAL);
   }
 
-  public addRenderFrame(key: string, frame: Frame) {
+  public addFrame(key: string, frame: Frame) {
     frame.init(this.gl);
     this.frames.set(key, frame);
   }
@@ -57,7 +57,7 @@ export default class Scene {
     this.gl.bindTexture(this.gl.TEXTURE_2D, this.textures.get(key));
   }
 
-  public getRenderFrame(key: string): Frame {
+  public getFrame(key: string): Frame {
     return this.frames.get(key);
   }
 
@@ -129,7 +129,7 @@ export default class Scene {
     }
   }
 
-  public setRenderFrame(key: string, frame: Frame) {
+  public setFrame(key: string, frame: Frame) {
     this.frames.set(key, frame);
   }
 

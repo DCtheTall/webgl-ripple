@@ -1,6 +1,7 @@
 const express = require('express');
 const morgan = require('morgan');
 const {join, resolve} = require('path');
+const fs = require('fs');
 
 const app = module.exports = express();
 

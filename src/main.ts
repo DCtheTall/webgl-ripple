@@ -13,24 +13,21 @@ const WINDOW_FRAGMENT_SHADER =
 const FULL_VIEW_PLANE_VERTICES = [-1, 1, -1, -1, 1, 1, 1, -1];
 const FULL_PLANE_VIEW_TEX_COORDS = [0, 1, 0, 0, 1, 1, 1, 0];
 
-function initCanvasWithNormalDistribution() {
+function onMouseMove(event: MouseEvent, callback: (x: number, y: number) => void) {
+  const x = event.clientX / window.innerWidth;
+  const y = (window.innerHeight - event.clientY) / window.innerHeight;
+  callback(x, y);
+}
+
+function initCanvas() {
   const canvas = document.createElement('canvas') as HTMLCanvasElement;
   const w = canvas.width = window.innerWidth;
   const h = canvas.height = window.innerHeight;
   const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
 
-  const mu = [w, h].map((x) => Math.round(x / 2));
-  const sigma = 1;
-
+  ctx.fillStyle = 'rgba(122.5, 122.5, 122.5, 1)';
   for (let x = 0; x < w; x++)
   for (let y = 0; y < h; y++) {
-    let u = ((x - mu[0]) ** 2) + ((y - mu[1]) ** 2);
-    u /= (sigma ** 2);
-    u = Math.exp(-u);
-    if (u < 1e-4) u = 0;
-    u = (0.5 * u) + 0.5;
-    u *= 255;
-    ctx.fillStyle = `rgba(${u},${u},${u},1)`;
     ctx.fillRect(x, y, 1, 1);
   }
 
@@ -53,9 +50,11 @@ document.body.onload = function main() {
     uPreviousFrame0: new IntegerUniform('u_PreviousFrame0', {data: 0}),
     uPreviousFrame1: new IntegerUniform('u_PreviousFrame1', {data: 1}),
     uResolution: new Vector2Uniform('u_Resolution', {data: [w, h]}),
+    uInput: new IntegerUniform('u_Input', {data: 0}),
+    uMousePosition: new Vector2Uniform('u_MousePosition', {data: [0, 0]}),
   });
   for (let i = 0; i < 3; i++) {
-    scene.addRenderFrame(`ripple${i}`, new Frame(w, h, 4, rippleShader));
+    scene.addFrame(`ripple${i}`, new Frame(w, h, 4, rippleShader));
   }
 
   const windowShader = new Shader(VERTEX_SHADER, WINDOW_FRAGMENT_SHADER, {
@@ -66,9 +65,17 @@ document.body.onload = function main() {
   }, {
     uCurrentFrame: new IntegerUniform('u_CurrentFrame', {data: 0}),
   });
-  scene.addRenderFrame('window', new Frame(w, h, 4, windowShader));
+  scene.addFrame('window', new Frame(w, h, 4, windowShader));
+  scene.addTexture('normal_dist', initCanvas());
 
-  scene.addTexture('normal_dist', initCanvasWithNormalDistribution());
+  document.addEventListener(
+    'mousemove',
+    (ev) => onMouseMove(ev, (x: number, y: number) => {
+      scene.getFrame('ripple2').shader.setUniformData('uInput', 1);
+      scene.getFrame('ripple2').shader.setUniformData('uMousePosition', [x, y]);
+      // setTimeout(
+      //     () => scene.getFrame('ripple2').shader.setUniformData('uInput', 0));
+    }));
 
   let epoch = 0;
   scene.render(true, () => {
@@ -77,19 +84,23 @@ document.body.onload = function main() {
         scene.bindTexture('normal_dist', WebGLRenderingContext.TEXTURE0);
         scene.bindTexture('normal_dist', WebGLRenderingContext.TEXTURE1);
         scene.renderFrameAsTexture('ripple0', WebGLRenderingContext.TEXTURE0);
+        break;
+
       case 1:
         scene.bindTexture('normal_dist', WebGLRenderingContext.TEXTURE0);
         scene.bindFrameToTexture('ripple0', WebGLRenderingContext.TEXTURE1);
         scene.renderFrameAsTexture('ripple1', WebGLRenderingContext.TEXTURE0);
+        break;
+
       default:
         scene.bindFrameToTexture('ripple0', WebGLRenderingContext.TEXTURE0);
         scene.bindFrameToTexture('ripple1', WebGLRenderingContext.TEXTURE1);
         scene.renderFrameAsTexture('ripple2', WebGLRenderingContext.TEXTURE0);
 
-        const tmp = scene.getRenderFrame('ripple0');
-        scene.setRenderFrame('ripple0', scene.getRenderFrame('ripple1'));
-        scene.setRenderFrame('ripple1', scene.getRenderFrame('ripple2'));
-        scene.setRenderFrame('ripple2', tmp);
+        const tmp = scene.getFrame('ripple0');
+        scene.setFrame('ripple0', scene.getFrame('ripple1'));
+        scene.setFrame('ripple1', scene.getFrame('ripple2'));
+        scene.setFrame('ripple2', tmp);
         break;
     }
     scene.renderFrameToCanvas('window');
