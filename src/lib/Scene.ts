@@ -1,7 +1,7 @@
 import Frame from './Frame';
 
 const CLEAR_COLOR = [0, 0, 0, 1];
-const FRAME_RATE = 120;
+const FRAME_RATE = 60;
 
 function isPowerOfTwo(n: number): boolean {
   return (n & (n - 1)) === 0;

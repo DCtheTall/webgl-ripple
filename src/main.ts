@@ -73,8 +73,6 @@ document.body.onload = function main() {
     (ev) => onMouseMove(ev, (x: number, y: number) => {
       scene.getFrame('ripple2').shader.setUniformData('uInput', 1);
       scene.getFrame('ripple2').shader.setUniformData('uMousePosition', [x, y]);
-      // setTimeout(
-      //     () => scene.getFrame('ripple2').shader.setUniformData('uInput', 0));
     }));
 
   let epoch = 0;
