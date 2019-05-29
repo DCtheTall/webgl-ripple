@@ -2,13 +2,15 @@ import Scene from './lib/Scene';
 import Frame from './lib/Frame';
 import Shader from './lib/Shader';
 import { Vector2Attribute } from './lib/ShaderAttribute';
-import { IntegerUniform, ShaderUniform, Vector2Uniform } from './lib/ShaderUniform';
+import { IntegerUniform, Vector2Uniform } from './lib/ShaderUniform';
 
 const VERTEX_SHADER = require('./shaders/vertex.glsl') as string;
 const RIPPLE_FRAGMENT_SHADER =
     require('./shaders/ripple.fragment.glsl') as string;
 const WINDOW_FRAGMENT_SHADER =
     require('./shaders/window.fragment.glsl') as string;
+const WATER_FRAGMENT_SHADER =
+    require('./shaders/water.fragment.glsl') as string;
 
 const FULL_VIEW_PLANE_VERTICES = [-1, 1, -1, -1, 1, 1, 1, -1];
 const FULL_PLANE_VIEW_TEX_COORDS = [0, 1, 0, 0, 1, 1, 1, 0];
@@ -57,6 +59,18 @@ document.body.onload = function main() {
     scene.addFrame(`ripple${i}`, new Frame(w, h, 4, rippleShader));
   }
 
+  const waterShader = new Shader(VERTEX_SHADER, WATER_FRAGMENT_SHADER, {
+    aVertices: new Vector2Attribute(
+        'a_Position', {data: FULL_VIEW_PLANE_VERTICES}),
+    aTextureCoord: new Vector2Attribute(
+        'a_TextureCoord', {data: FULL_PLANE_VIEW_TEX_COORDS}),
+  }, {
+    uHeightMap: new IntegerUniform('u_HeightMap', {data: 0}),
+    uTexture: new IntegerUniform('u_Texture', {data: 1}),
+    uResolution: new Vector2Uniform('u_Resolution', {data: [w, h]}),
+  });
+  scene.addFrame('water', new Frame(w, h, 4, waterShader));
+
   const windowShader = new Shader(VERTEX_SHADER, WINDOW_FRAGMENT_SHADER, {
     aVertices: new Vector2Attribute(
         'a_Position', {data: FULL_VIEW_PLANE_VERTICES}),
@@ -66,7 +80,10 @@ document.body.onload = function main() {
     uCurrentFrame: new IntegerUniform('u_CurrentFrame', {data: 0}),
   });
   scene.addFrame('window', new Frame(w, h, 4, windowShader));
+
   scene.addTexture('normal_dist', initCanvas());
+  scene.addTexture(
+      'pond', document.getElementById('pond-img') as HTMLImageElement);
 
   document.addEventListener(
     'mousemove',
@@ -82,18 +99,24 @@ document.body.onload = function main() {
         scene.bindTexture('normal_dist', WebGLRenderingContext.TEXTURE0);
         scene.bindTexture('normal_dist', WebGLRenderingContext.TEXTURE1);
         scene.renderFrameAsTexture('ripple0', WebGLRenderingContext.TEXTURE0);
+        scene.bindTexture('pond', WebGLRenderingContext.TEXTURE1);
+        scene.renderFrameAsTexture('water', WebGLRenderingContext.TEXTURE0);
         break;
 
       case 1:
         scene.bindTexture('normal_dist', WebGLRenderingContext.TEXTURE0);
         scene.bindFrameToTexture('ripple0', WebGLRenderingContext.TEXTURE1);
         scene.renderFrameAsTexture('ripple1', WebGLRenderingContext.TEXTURE0);
+        scene.bindTexture('pond', WebGLRenderingContext.TEXTURE1);
+        scene.renderFrameAsTexture('water', WebGLRenderingContext.TEXTURE0);
         break;
 
       default:
         scene.bindFrameToTexture('ripple0', WebGLRenderingContext.TEXTURE0);
         scene.bindFrameToTexture('ripple1', WebGLRenderingContext.TEXTURE1);
         scene.renderFrameAsTexture('ripple2', WebGLRenderingContext.TEXTURE0);
+        scene.bindTexture('pond', WebGLRenderingContext.TEXTURE1);
+        scene.renderFrameAsTexture('water', WebGLRenderingContext.TEXTURE0);
 
         const tmp = scene.getFrame('ripple0');
         scene.setFrame('ripple0', scene.getFrame('ripple1'));
