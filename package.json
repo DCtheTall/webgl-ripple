@@ -4,7 +4,8 @@
   "description": "A WebGL canvas utility that renders a ripple effect.",
   "scripts": {
     "start": "node bin/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "heroku-postbuild": "webpack --mode=production"
   },
   "repository": {
     "type": "git",
@@ -31,6 +32,7 @@
     "ts-loader": "^5.3.1",
     "typescript": "^3.2.1",
     "webgl-obj-loader": "^2.0.2",
-    "webpack": "^4.26.1"
+    "webpack": "^4.26.1",
+    "webpack-cli": "^3.3.2"
   }
 }

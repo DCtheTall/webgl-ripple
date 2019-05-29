@@ -86,11 +86,12 @@ document.body.onload = function main() {
       'pond', document.getElementById('pond-img') as HTMLImageElement);
 
   document.addEventListener(
-    'mousemove',
-    (ev) => onMouseMove(ev, (x: number, y: number) => {
-      scene.getFrame('ripple2').shader.setUniformData('uInput', 1);
-      scene.getFrame('ripple2').shader.setUniformData('uMousePosition', [x, y]);
-    }));
+      'mousemove',
+      (ev) => onMouseMove(ev, (x: number, y: number) => {
+        scene.getFrame('ripple2').shader.setUniformData('uInput', 1);
+        scene.getFrame('ripple2').shader.setUniformData('uMousePosition', [x, y]);
+      }));
+  document.addEventListener('mousedown', () => scene.toggleAnimation());
 
   let epoch = 0;
   scene.render(true, () => {

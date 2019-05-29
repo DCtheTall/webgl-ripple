@@ -38,8 +38,8 @@ void main() {
     vec3 axial = normalize(normal - VIEW_VECTOR);
     float sine = length(cross(normal, VIEW_VECTOR));
     sine *= REFRACTIVE_INDEX;
-    float tang = tan(asin(sine));
-    vec3 displacement = normalize(vec3(tang * H * axial.xy, H)) / 10.0;
+    float offset = tan(asin(sine)) * H;
+    vec3 displacement = normalize(vec3(offset * axial.xy, H)) / 100.0;
     transformedTexCoord = v_TextureCoord + displacement.xy;
   }
 
