@@ -38,7 +38,7 @@ void main() {
   } else {
     vec3 axial = normalize(normal - VIEW_VECTOR);
     float sine = length(cross(normal, VIEW_VECTOR));
-    sine *= REFRACTIVE_INDEX;
+    sine /= REFRACTIVE_INDEX;
     // Negative sign is for reflection through the Z plane.
     vec3 displacement = normalize(vec3(-(sine / cosine) * H * axial.xy, H));
     transformedTexCoord = v_TextureCoord; //+ displacement.xy;
