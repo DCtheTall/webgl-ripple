@@ -8,11 +8,11 @@ uniform vec2 u_Resolution;
 
 const float DEPTH = 10.0;
 const float PERTURBANCE = 0.05;
-const vec3 VIEW_VECTOR = vec3(0.0, 0.0, -1.0);
+const vec3 VIEW_VECTOR = vec3(0.0, 0.0, 1.0);
 const vec3 LIGHT_POSITION = normalize(vec3(4.0, 6.0, 1.0));
 const float AMBIENT = 0.9;
 const float LAMBERTIAN = 0.4;
-const float REFRACTIVE_INDEX = 1.1;
+const float REFRACTIVE_INDEX = 1.33;
 
 float getWaterHeight(float texHeight) {
   return DEPTH + (2.0 * texHeight - 1.0) * PERTURBANCE;
@@ -32,15 +32,16 @@ void main() {
   vec3 normal = normalize(cross(dx, dy));
 
   vec2 transformedTexCoord;
-  if (normal == VIEW_VECTOR) {
+  float cosine = dot(normal, VIEW_VECTOR);
+  if (cosine >= 0.99) {
     transformedTexCoord = v_TextureCoord;
   } else {
     vec3 axial = normalize(normal - VIEW_VECTOR);
     float sine = length(cross(normal, VIEW_VECTOR));
     sine *= REFRACTIVE_INDEX;
-    float offset = tan(asin(sine)) * H;
-    vec3 displacement = normalize(vec3(offset * axial.xy, H)) / 100.0;
-    transformedTexCoord = v_TextureCoord + displacement.xy;
+    // Negative sign is for reflection through the Z plane.
+    vec3 displacement = normalize(vec3(-(sine / cosine) * H * axial.xy, H));
+    transformedTexCoord = v_TextureCoord; //+ displacement.xy;
   }
 
   // Lighting.
