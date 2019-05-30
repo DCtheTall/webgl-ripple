@@ -59,3 +59,11 @@ The code in this repository is released under an Apache 2.0 license and is the c
 of Google Inc.
 
 It is available for free and fair use. See the LICNSE for more information.
+
+## Improvements
+
+Really the same effect can be achieved with just one heightmap which uses each of the
+red, blue, and green channels to keep track of the 3 most recent states of the water
+height.
+
+I can do this if there is a demand, and PRs are welcome if someone wants to give it a try.
