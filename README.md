@@ -12,58 +12,63 @@ using WebGL. Click here for a [live demo](https://dcthetall-webgl-ripple.herokua
 In nature, wave propagation is given by the [wave equation](https://en.wikipedia.org/wiki/Wave_equation),
 a second order partial differential equation:
 
-<a href="https://www.codecogs.com/eqnedit.php?latex=\frac{\partial^2u}{\partial&space;t}&space;=&space;c^2&space;\,\nabla^2&space;u" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\frac{\partial^2u}{\partial&space;t}&space;=&space;c^2&space;\,\nabla^2&space;u" title="\frac{\partial^2u}{\partial t} = c^2 \,\nabla^2 u" /></a>
+<img src="https://tex.s2cms.ru/svg/%20%5Cfrac%7B%5Cpartial%5E2%20u%7D%7B%5Cpartial%20t%5E%7B%5C%2C2%7D%7D%20%3D%20c%5E%7B%5C%2C2%7D%5C%2C%5Cnabla%5E2u%20" alt=" \frac{\partial^2 u}{\partial t^{\,2}} = c^{\,2}\,\nabla^2u " />
 
-where <a href="https://www.codecogs.com/eqnedit.php?latex=\nabla^2" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\nabla^2" title="\nabla^2" /></a>
-is the [Laplace operator](https://en.wikipedia.org/wiki/Laplace_operator).
+where <img src="https://tex.s2cms.ru/svg/%5Cnabla%5E2" alt="\nabla^2" /> is the [Laplace operator](https://en.wikipedia.org/wiki/Laplace_operator). If we treat <img src="https://tex.s2cms.ru/svg/c" alt="c" /> as unity, we can simplify the PDE to
 
-The program numerically solves the differential equation using [Verlet integration](https://en.wikipedia.org/wiki/Verlet_integration#Basic_St%C3%B6rmer%E2%80%93Verlet),
-a method for discretizing PDEs given by
+<img src="https://tex.s2cms.ru/svg/%20%5Cfrac%7B%5Cpartial%5E2%20u%7D%7B%5Cpartial%20t%5E%7B%5C%2C2%7D%7D%20%3D%20%5Cnabla%5E2u%20" alt=" \frac{\partial^2 u}{\partial t^{\,2}} = \nabla^2u " />
 
-<a href="https://www.codecogs.com/eqnedit.php?latex=\ddot{\mathbf{x}}(t)&space;=&space;F(\mathbf{x}(t))" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\ddot{\mathbf{x}}(t)&space;=&space;F(\mathbf{x}(t))" title="\ddot{\mathbf{x}}(t) = F(\mathbf{x}(t))" /></a>
+To simulate waves, the program numerically solves the differential equation above using
+[Verlet integration](https://en.wikipedia.org/wiki/Verlet_integration#Basic_St%C3%B6rmer%E2%80%93Verlet),
+a method for iteratively solving second order ordinary differential equations of the form:
 
-In this case <a href="https://www.codecogs.com/eqnedit.php?latex=F(\mathbf{x}(t))" target="_blank"><img src="https://latex.codecogs.com/gif.latex?F(\mathbf{x}(t))" title="F(\mathbf{x}(t))" /></a>
+<img src="https://tex.s2cms.ru/svg/%20%5Cddot%7B%5Cmathbf%7Bx%7D%7D(t)%20%3D%20F(%5Cmathbf%7Bx%7D(t))%20" alt=" \ddot{\mathbf{x}}(t) = F(\mathbf{x}(t)) " />
+
+In this case <img src="https://tex.s2cms.ru/svg/F(%5Cmathbf%7Bx%7D(t))" alt="F(\mathbf{x}(t))" />
 is a [convolution](https://en.wikipedia.org/wiki/Convolution#Discrete_convolution)
 with the
 [discrete Laplace operator](https://en.wikipedia.org/wiki/Discrete_Laplace_operator),
 given by the kernel:
 
-<a href="https://www.codecogs.com/eqnedit.php?latex=\left[&space;\begin{matrix}&space;0.25&space;&&&space;0.5&space;&&&space;0.25&space;\\&space;0.5&space;&&&space;-3.0&space;&&&space;0.5&space;\\&space;0.25&space;&&&space;0.5&space;&&&space;0.25&space;\end{matrix}&space;\right]" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\left[&space;\begin{matrix}&space;0.25&space;&&&space;0.5&space;&&&space;0.25&space;\\&space;0.5&space;&&&space;-3.0&space;&&&space;0.5&space;\\&space;0.25&space;&&&space;0.5&space;&&&space;0.25&space;\end{matrix}&space;\right]" title="\left[ \begin{matrix} 0.25 && 0.5 && 0.25 \\ 0.5 && -3.0 && 0.5 \\ 0.25 && 0.5 && 0.25 \end{matrix} \right]" /></a>
+<img src="https://tex.s2cms.ru/svg/%5Cleft%5B%5Cbegin%7Bmatrix%7D%0A0.25%20%26%26%200.5%20%26%26%200.25%20%5C%5C%0A0.5%20%26%26%20-3%20%26%26%200.5%20%5C%5C%0A0.25%20%26%26%200.5%20%26%26%200.25%0A%5Cend%7Bmatrix%7D%5Cright%5D" alt="\left[\begin{matrix}
+0.25 &amp;&amp; 0.5 &amp;&amp; 0.25 \\
+0.5 &amp;&amp; -3 &amp;&amp; 0.5 \\
+0.25 &amp;&amp; 0.5 &amp;&amp; 0.25
+\end{matrix}\right]" />
 
-Verlet integration solves the PDE iteratively using the following formula:
+Verlet integration solves the ODE iteratively using the following formula:
 
-<a href="https://www.codecogs.com/eqnedit.php?latex=u_{n&plus;1}&space;=&space;2u_n&space;-&space;u_{n-1}&space;&plus;&space;(\mathbf{L}&space;*&space;u_n)&space;\Delta&space;t^{\,2}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?u_{n&plus;1}&space;=&space;2u_n&space;-&space;u_{n-1}&space;&plus;&space;(\mathbf{L}&space;*&space;u_n)&space;\Delta&space;t^{\,2}" title="u_{n+1} = 2u_n - u_{n-1} + (\mathbf{L} * u_n) \Delta t^{\,2}" /></a>
+<img src="https://tex.s2cms.ru/svg/%20u_%7Bn%2B1%7D%20%3D%202u_n%20%2B%20u_%7Bn-1%7D%20%2B%20(%5Cmathbf%7BL%7D%20*%20u_n)%5CDelta%20t%5E%7B%5C%2C2%7D%20" alt=" u_{n+1} = 2u_n + u_{n-1} + (\mathbf{L} * u_n)\Delta t^{\,2} " />
 
-where <a href="https://www.codecogs.com/eqnedit.php?latex=\mathbf{L}&space;*&space;u_n" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\mathbf{L}&space;*&space;u_n" title="\mathbf{L} * u_n" /></a>
-is, again, the convolution of the current height map with the
-discrete Laplace operator. In this program, we always treat
-<a href="https://www.codecogs.com/eqnedit.php?latex=\Delta&space;t" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\Delta&space;t" title="\Delta t" /></a>
-as unity, so it can be ignored.
+where <img src="https://tex.s2cms.ru/svg/%5Cmathbf%7BL%7D%20*%20u_n" alt="\mathbf{L} * u_n" /> the convolution of the height map
+discrete Laplace operator. For simplicity, the program treats <img src="https://tex.s2cms.ru/svg/%5CDelta%20t" alt="\Delta t" /> as unity as well.
 
 Afterwards, linear damping is applied to the wave so that it dissipates over time, like
 actual water.
 
 ## Implementation
 
-In order to compute the next iteration for Verlet integration, I needed to keep the 2 most
-recent iterations of the height map then map the result to a 3rd height map. That height map
-was sampled in a water shader which added Phong global illumination and refraction using ray
-tracing to make the water appear realistic.
+In order to compute the next iteration for Verlet integration, I needed to keep the 2 most recent iterations of the height map then map the result to a 3rd height map.
+That height map was sampled in a water shader which added
+[Phong global illumination](https://en.wikipedia.org/wiki/Phong_reflection_model)
+and refraction using ray tracing to make the water appear realistic.
 
-The source code is implemented almost entirely in TypeScript and GLSL using a TypeScript
-WebGL abstraction layer I have been working on. The shaders use [glslify](https://github.com/glslify/glslify) so that they can be modular.
+The source code is implemented almost entirely in TypeScript and GLSL using a TypeScript WebGL abstraction layer I have been working on. This API is build for iteratively applying shaders you write yourself.  It is by no means
+
+The shaders use [glslify](https://github.com/glslify/glslify) so that they can be modular.
 
 ## License
 
 The code in this repository is released under an Apache 2.0 license and is the copyright
 of Google Inc.
 
-It is available for free and fair use. See the LICNSE for more information.
+It is available for free and fair use. See the LICENSE for more information.
 
 ## Improvements
 
-Really the same effect can be achieved with just one heightmap which uses each of the
-red, blue, and green channels to keep track of the 3 most recent states of the water
+Really the same effect can be achieved with just one heightmap which uses each of the red, blue, and green channels to keep track of the 3 most recent states of the water
 height.
 
-I can do this if there is a demand, and PRs are welcome if someone wants to give it a try.
+A Guassian blur on the stone texture may make it better
+
+Also the water shader breaks on certain GPUs on Linux machines for some reason. I have not tested it on Windows.
