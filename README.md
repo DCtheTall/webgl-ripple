@@ -69,6 +69,6 @@ It is available for free and fair use. See the LICENSE for more information.
 Really the same effect can be achieved with just one heightmap which uses each of the red, blue, and green channels to keep track of the 3 most recent states of the water
 height.
 
-A Guassian blur on the stone texture may make it better
+A Guassian blur on the stone texture may make it look better.
 
 Also the water shader breaks on certain GPUs on Linux machines for some reason. I have not tested it on Windows.
