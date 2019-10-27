@@ -41,21 +41,24 @@ Verlet integration solves the ODE iteratively using the following formula:
 <img src="https://tex.s2cms.ru/svg/%20u_%7Bn%2B1%7D%20%3D%202u_n%20%2B%20u_%7Bn-1%7D%20%2B%20(%5Cmathbf%7BL%7D%20*%20u_n)%5CDelta%20t%5E%7B%5C%2C2%7D%20" alt=" u_{n+1} = 2u_n + u_{n-1} + (\mathbf{L} * u_n)\Delta t^{\,2} " />
 
 where <img src="https://tex.s2cms.ru/svg/%5Cmathbf%7BL%7D%20*%20u_n" alt="\mathbf{L} * u_n" /> the convolution of the height map
-discrete Laplace operator. For simplicity, the program treats <img src="https://tex.s2cms.ru/svg/%5CDelta%20t" alt="\Delta t" /> as unity as well.
+discrete Laplace operator. For simplicity, the program treats <img src="https://tex.s2cms.ru/svg/%5CDelta%20t" alt="\Delta t" /> as unity.
 
-Afterwards, linear damping is applied to the wave so that it dissipates over time, like
-actual water.
+Afterwards, linear damping is applied to the wave so that it dissipates over time.
 
 ## Implementation
 
-In order to compute the next iteration for Verlet integration, I needed to keep the 2 most recent iterations of the height map then map the result to a 3rd height map.
+In order to compute the next iteration for Verlet integration,
+I needed to keep the 2 most recent iterations of the height map then map the result to a 3rd height map.
 That height map was sampled in a water shader which added
 [Phong global illumination](https://en.wikipedia.org/wiki/Phong_reflection_model)
 and refraction using ray tracing to make the water appear realistic.
 
-The source code is implemented almost entirely in TypeScript and GLSL using a TypeScript WebGL abstraction layer I have been working on. This API is build for iteratively applying shaders you write yourself.  It is by no means
+The source code is implemented almost entirely in TypeScript and GLSL using
+a TypeScript WebGL abstraction layer I have been working on.
+This API is build for iteratively applying shaders you write yourself.
 
-The shaders use [glslify](https://github.com/glslify/glslify) so that they can be modular.
+The shaders that use [glslify](https://github.com/glslify/glslify) can be modular,
+so this API is more focused on applying shader programs to a WebGL scene.
 
 ## License
 
