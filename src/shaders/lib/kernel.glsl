@@ -5,7 +5,11 @@ Utility function for applying a convolution with a 3x3 kernel.
 */
 
 float convoluteMatrices(mat3 A, mat3 B) {
-  return dot(A[0], B[0]) + dot(A[1], B[1]) + dot(A[2], B[2]);
+  float result = 0;
+  for (int i = 0; i < 3; i++) {
+    result += dot(A[i], B[i]);
+  }
+  return result;
 }
 
 float applyKernel(sampler2D textureSampler, vec2 textureCoord, vec2 resolution, mat3 kernel) {
