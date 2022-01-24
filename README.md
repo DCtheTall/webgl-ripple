@@ -5,7 +5,7 @@ by Dylan Cutler (DCtheTall)
 ## Summary
 
 This repo contains source code for an interactive water ripple effect created
-using WebGL. Click here for a [live demo](https://dcthetall-webgl-ripple.herokuapp.com/).
+using WebGL. ~~Click here for a [live demo](https://dcthetall-webgl-ripple.herokuapp.com/).~~
 
 ## Algorithm
 
